@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/core-js": "^0.9.43",
     "@types/node": "^8.0.28"
   },
   "dependencies": {

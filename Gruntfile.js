@@ -18,7 +18,7 @@ grunt.initConfig({
       options: {
         module: 'system', 
         moduleResolution: 'node',
-        target: 'es5',
+        target: 'es2015',
         experimentalDecorators: true,
         emitDecoratorMetadata: true,
         noImplicitAny: false,
