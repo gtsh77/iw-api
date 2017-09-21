@@ -16,8 +16,6 @@ grunt.initConfig({
     base: {
       files: [{ src: ['src/api.ts'], dest: 'dest/api.js' }],
       options: {
-        module: 'system', 
-        moduleResolution: 'node',
         target: 'es2015',
         experimentalDecorators: true,
         emitDecoratorMetadata: true,
