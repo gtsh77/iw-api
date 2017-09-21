@@ -15,7 +15,7 @@ interface playerListItem {
 }
 
 class Main {
-	protected server = require('http').createServer().listen(8590);
+	protected server = require('http').createServer().listen(8595);
 	protected url = require('url');
 	protected pool = require('mysql').createPool({
 		connectionLimit : 10,
@@ -29,30 +29,47 @@ class Main {
 	public init(): void {
 		console.log('inited');
 		this.server.on('request',(req,res) => {
-			let url: string = this.url.parse(req.url).pathname;
-			if(url === '/get/players') this.getPlayers((data) => {
+			let url = this.url.parse(req.url);
+			if(url.pathname === '/get/players') this.getPlayers(url,(data) => {
 				res.end(data);
 			});
 			else res.end(JSON.stringify({'status':'OK'}));
 		});
 	}
 
-	public getPlayers(callback): any {
+	public getPlayers(url,callback): any {
+		// /get/players?order_by=points&desc=true
+
 		let players = {
 			items: [],
 			length: 0
 		};
+		//console.log(url.query);
+		var options = {
+			order_by: 'points',
+			desc: 'true'
+		},
+		temp = null;
+
+		if(url.query !== null) temp = url.query.split('&');
+
+		for(var a in temp){
+			let temp2 = temp[a].split('=');
+			options[temp2[0]] = temp2[1]; 
+		}
+
+
 		this.pool.getConnection((e, connection) => {
+			//console.log(options.order_by);
 			//if(e) this.storeError(e,'error.log');
 			connection.query(`
 				-- запросим игроков с хешем
 				SELECT players.hash,nickName,points,wins,assists,losses,countryCode from profiles 
 					INNER JOIN players ON players.id = playerId 
-				ORDER BY points DESC;
+				ORDER BY ${options.order_by} ${options.desc === 'true' ? 'DESC':'ASC'};
 			`,
 			(e, res, fields) => {
 				//if(e) this.storeError(e,'error.log');
-				//console.log(`${fields}`);
 				connection.release();
 				for(var a in res){
 					players.items.push(res[a]);
@@ -62,10 +79,8 @@ class Main {
 			});
 		});
 
-		//запрос в базу
+		//raw select
 		//select players.hash,nickName,points,wins,assists,losses,countryCode from profiles INNER JOIN players ON players.id = playerId order by points desc;
-
-		//сборка объекта
 
 	}
 }
