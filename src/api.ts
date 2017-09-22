@@ -15,7 +15,7 @@ interface playerListItem {
 }
 
 class Main {
-	protected server = require('http').createServer().listen(8595);
+	protected server = require('http').createServer().listen(8580);
 	protected url = require('url');
 	protected pool = require('mysql').createPool({
 		connectionLimit : 10,
@@ -47,7 +47,9 @@ class Main {
 		//console.log(url.query);
 		var options = {
 			order_by: 'points',
-			desc: 'true'
+			desc: 'true',
+			offset: '0',
+			limit: '5'
 		},
 		temp = null;
 
@@ -66,7 +68,7 @@ class Main {
 				-- запросим игроков с хешем
 				SELECT players.hash,nickName,points,wins,assists,losses,countryCode from profiles 
 					INNER JOIN players ON players.id = playerId 
-				ORDER BY ${options.order_by} ${options.desc === 'true' ? 'DESC':'ASC'};
+				ORDER BY ${options.order_by} ${options.desc === 'true' ? 'DESC':'ASC'} LIMIT ${options.offset},${options.limit};
 			`,
 			(e, res, fields) => {
 				//if(e) this.storeError(e,'error.log');
